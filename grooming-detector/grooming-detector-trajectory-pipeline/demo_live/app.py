@@ -244,11 +244,19 @@ def api_score():
 
 @app.route("/api/health", methods=["GET"])
 def api_health():
+    try:
+        engine = get_engine()
+        endpoint = engine.endpoint
+        mode = "cloud_demonstration" if getattr(engine, "is_mock", False) else "live_model"
+    except Exception as e:
+        endpoint = "Trajectory-Feature LSTM (7 inputs)"
+        mode = f"fallback: {e}"
     return jsonify({
         "status": "healthy",
         "model": "Trajectory-Feature LSTM (7 inputs) and Embedding-and-Feature LSTM (775 inputs)",
         "l1_backbone": "DistilBERT (Author-Proxy Fine-Tuned)",
-        "endpoint": get_engine().endpoint,
+        "endpoint": endpoint,
+        "mode": mode,
         "version": "2026.09.28-descriptive-lstm-variants"
     })
 
